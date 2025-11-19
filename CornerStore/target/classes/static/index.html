@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>corner store</title>
+    <style>
+        :root {
+            --bg:#f7f7f9;
+            --card:#ffffff;
+            --accent:#2b8a3e;
+            --muted:#6b7280;
+            --maxw:900px;
+            font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+        }
+        body {
+            margin:0;
+            background:linear-gradient(180deg, #fbfdff 0%, var(--bg) 100%);
+            color:#111827;
+            display:flex;
+            min-height:100vh;
+            align-items:center;
+            justify-content:center;
+            padding:32px;
+        }
+        .container {
+            width:100%;
+            max-width:var(--maxw);
+        }
+        header {
+            display:flex;
+            align-items:center;
+            gap:16px;
+            margin-bottom:24px;
+        }
+        .logo {
+            width:56px;
+            height:56px;
+            background:var(--accent);
+            border-radius:10px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            color:white;
+            font-weight:700;
+            font-size:20px;
+            flex:0 0 56px;
+            box-shadow:0 4px 12px rgba(43,138,62,0.12);
+        }
+        h1 {
+            margin:0;
+            font-size:22px;
+            letter-spacing:-0.2px;
+        }
+        p.lead {
+            margin:8px 0 0 72px;
+            color:var(--muted);
+            font-size:14px;
+        }
+
+        main {
+            background:var(--card);
+            border-radius:12px;
+            padding:24px;
+            box-shadow:0 6px 18px rgba(15,23,42,0.06);
+        }
+        .grid {
+            display:grid;
+            grid-template-columns:1fr;
+            gap:12px;
+        }
+        .card {
+            padding:14px;
+            border-radius:8px;
+            background:linear-gradient(180deg, #fff 0%, #fbfdff 100%);
+            border:1px solid rgba(15,23,42,0.04);
+        }
+        footer {
+            margin-top:18px;
+            color:var(--muted);
+            font-size:13px;
+            text-align:center;
+        }
+
+        @media(min-width:700px){
+            .grid { grid-template-columns: repeat(3,1fr); }
+            p.lead { margin-left:0; }
+            header { gap:20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">CS</div>
+            <div>
+                <h1>corner store</h1>
+                <p class="lead">Fresh essentials and everyday favorites — your neighborhood corner store online.</p>
+            </div>
+        </header>
+
+        <main>
+            <div class="grid">
+                <div class="card">
+                    <strong>Groceries</strong>
+                    <p style="margin:6px 0 0;color:var(--muted);font-size:14px;">Staples, snacks, beverages and more.</p>
+                </div>
+                <div class="card">
+                    <strong>Household</strong>
+                    <p style="margin:6px 0 0;color:var(--muted);font-size:14px;">Cleaning supplies and everyday essentials.</p>
+                </div>
+                <div class="card">
+                    <strong>Quick bites</strong>
+                    <p style="margin:6px 0 0;color:var(--muted);font-size:14px;">Grab-and-go items for a fast pick-up.</p>
+                </div>
+            </div>
+
+            <footer>
+                © <span id="year"></span> corner store — Open daily. Built with simplicity.
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>

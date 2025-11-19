@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-CornerStoreApplication<CornerStore>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.csproj.CornerStore.CornerStoreApplication",
+            "projectName": "CornerStore",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

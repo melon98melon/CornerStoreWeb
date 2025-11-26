@@ -1,4 +1,4 @@
-<template>
+<!--<template>
   <div class="product-grid">
     <Card v-for="product in products" :key="product.id" class="product-card">
       <template #header>
@@ -47,3 +47,10 @@ export default {
   object-fit: cover;
 }
 </style>
+-->
+<template>
+  <div>
+    <h1>About us</h1>
+    <p>This is a project</p>
+  </div>
+</template>

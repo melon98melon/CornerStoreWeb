@@ -13,7 +13,8 @@ import Navbar from './components/navbar.vue';
 </template>
 
 <style scoped>
-header {
+
+/*header {
   line-height: 1.5;
   max-height: 100vh;
 }
@@ -31,5 +32,5 @@ header {
     flex-wrap: wrap;
   }
 
-}
+}*/
 </style>

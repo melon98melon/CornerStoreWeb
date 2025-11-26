@@ -9,6 +9,16 @@
             "projectName": "CornerStore",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Run CornerStore JAR",
+            "request": "launch",
+            "mainClass": "com.csproj.CornerStore.CornerStoreApplication",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "preLaunchTask": "Build JAR"
         }
-    ]
+  ]
 }

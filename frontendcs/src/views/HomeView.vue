@@ -1,9 +1,10 @@
 <script setup>
-import TheWelcome from '../components/TheWelcome.vue'
 </script>
 
 <template>
   <main>
-    <TheWelcome />
+    <h1>Welcome to CornerStore</h1>
+    <p>Your one-stop shop for all your needs!</p>
+    
   </main>
 </template>

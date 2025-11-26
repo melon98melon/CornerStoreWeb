@@ -37,7 +37,7 @@
 
   --section-gap: 160px;
 }
-
+/*
 @media (prefers-color-scheme: dark) {
   :root {
     --color-background: var(--vt-c-black);
@@ -50,7 +50,7 @@
     --color-heading: var(--vt-c-text-dark-1);
     --color-text: var(--vt-c-text-dark-2);
   }
-}
+}*/
 
 *,
 *::before,
@@ -62,8 +62,8 @@
 
 body {
   min-height: 100vh;
-  color: var(--color-text);
-  background: var(--color-background);
+  color: black;
+  background: var(--vt-cream);
   transition:
     color 0.5s,
     background-color 0.5s;

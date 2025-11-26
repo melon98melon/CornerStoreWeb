@@ -1,22 +1,27 @@
 <template>
     <section class="products-gallery">
+        <div class="title">
+            <h2>Our Products</h2>
+            <p>Browse our selection of quality items! From your internet to your door.</p>
+        </div>
         <div
             class="card"
-            v-for="product in products"
+            v-for="product in productStore.products"
             :key="product.id"
             :aria-label="product.name"
         >
             <div class="image-wrap">
                 <img :src="product.image || placeholder" :alt="product.name" />
-                <span v-if="product.sale" class="badge">-{{ product.sale }}%</span>
+                <!--<span v-if="product.sale" class="badge">-{{ product.sale }}%</span>-->
             </div>
 
             <div class="info">
                 <h3 class="name">{{ product.name }}</h3>
 
                 <div class="price">
-                    <span class="current">\${{ salePrice(product).toFixed(2) }}</span>
-                    <span v-if="product.sale" class="original">\${{ product.price.toFixed(2) }}</span>
+                    <!--<span class="current">\${{typeof product.price === "number"? salePrice(product).toFixed(2) : "N/A" }}</span>
+                    <span v-if="product.sale" class="original">\${{ typeof product.price === "number"? product.price.toFixed(2): "N/A" }}</span>-->
+                    <span class="current">\${{ typeof product.price === "number"? product.price.toFixed(2): "N/A" }}</span>
                 </div>
 
                 <div class="actions">
@@ -30,7 +35,6 @@
                         @click="toggleLike(product)"
                     >
                         <span class="heart" :class="{ liked: isLiked(product) }">♥</span>
-                        <span class="count" v-if="likes[product.id]">{{ likes[product.id] }}</span>
                     </button>
                 </div>
             </div>
@@ -40,30 +44,26 @@
 
 <script setup>
 import { reactive, ref } from 'vue'
+import { onMounted } from 'vue'
+import { useProductStore } from '../stores/productStore'
+
+const productStore = useProductStore()
+
+onMounted(() => {
+  productStore.fetchProducts()
+})
+console.log(productStore.products)
+console.log('Products loaded in products.vue')
+console.log(productStore.products[0])
 
 const emit = defineEmits(['buy', 'like'])
 
 // Placeholder or fallback image
 const placeholder = 'https://via.placeholder.com/320x200?text=No+Image'
 
-// Example products; replace with props or fetch as needed
-const products = ref([
-    { id: 1, name: 'Denim Jacket', price: 79.99, sale: 20, image: '' },
-    { id: 2, name: 'Running Shoes', price: 120.0, sale: 0, image: '' },
-    { id: 3, name: 'Classic Shirt', price: 45.5, sale: 10, image: '' },
-    { id: 4, name: 'Leather Wallet', price: 35.0, sale: 0, image: '' },
-])
 
 // Simple likes store: map productId -> count (and treat >0 as liked)
 const likes = reactive({})
-
-// Toggle like: increment/decrement count and emit event
-function toggleLike(product) {
-    const id = product.id
-    if (!likes[id]) likes[id] = 1
-    else likes[id] = 0
-    emit('like', { product, liked: !!likes[id] })
-}
 
 // Check if product is liked
 function isLiked(product) {
@@ -83,8 +83,16 @@ function salePrice(product) {
 </script>
 
 <style scoped>
+.title {
+    text-align: center;
+    margin-bottom: 1rem;
+    position: absolute;
+    width: 100%;
+    top: 0;
+}
 .products-gallery {
     display: grid;
+    align-items: center;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 1rem;
     padding: 1rem;

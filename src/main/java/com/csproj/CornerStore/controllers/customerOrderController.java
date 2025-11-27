@@ -1,57 +1,40 @@
 package com.csproj.CornerStore.controllers;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import com.csproj.CornerStore.entity.customerOrder;
 import com.csproj.CornerStore.service.customerOrderService;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/orders")
+@RequestMapping("/api/orders")
 public class customerOrderController {
 
-    private final customerOrderService orderService;
+    private final customerOrderService customerOrderService;
 
-    public customerOrderController(customerOrderService orderService) {
-        this.orderService = orderService;
+    public customerOrderController(customerOrderService customerOrderService) {
+        this.customerOrderService = customerOrderService;
     }
 
     @GetMapping
     public List<customerOrder> getAllOrders() {
-        return orderService.getAllOrders();
+        return customerOrderService.getAllOrders();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<customerOrder> getOrderById(@PathVariable Integer id) {
-        return orderService.getOrderById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @GetMapping("/customer/{customerId}")
-    public List<customerOrder> getOrdersByCustomer(@PathVariable Integer customerId) {
-        return orderService.getOrdersByCustomerId(customerId);
+    public Optional<customerOrder> getOrderById(@PathVariable int id) {
+        return customerOrderService.getOrderById(id);
     }
 
     @PostMapping
     public customerOrder createOrder(@RequestBody customerOrder order) {
-        return orderService.createOrder(order);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<customerOrder> updateOrder(@PathVariable Integer id, @RequestBody customerOrder order) {
-        try {
-            return ResponseEntity.ok(orderService.updateOrder(id, order));
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return customerOrderService.createOrder(order);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteOrder(@PathVariable Integer id) {
-        orderService.deleteOrder(id);
-        return ResponseEntity.noContent().build();
+    public void deleteOrder(@PathVariable int id) {
+        customerOrderService.deleteOrder(id);
     }
 }
 

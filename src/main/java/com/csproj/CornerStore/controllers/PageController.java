@@ -1,22 +1,31 @@
 package com.csproj.CornerStore.controllers;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 public class PageController {
-   /* @GetMapping("/")
+    @GetMapping("/")
     public String homeRedirect() {
         // Redirect root URL to /products
         return "redirect:/products";
-    }*/
+    }
        @GetMapping("/products")
     public String productsPage() {
         return "products"; // maps to products.html in /templates
     }
 
+    @GetMapping("/products/{id}")
+    public String productDetailsPage(@PathVariable long id, Model model) {
+        model.addAttribute("productId", id);
+        return "product-details"; // product-details.html
+    }
 
-        
-
+    @GetMapping("/admin")
+    public String productsAdminPage() {
+        return "admin"; // maps to admin.html in /templates
+    }
 
 }

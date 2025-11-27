@@ -36,8 +36,6 @@ const year = ref(new Date().getFullYear())
 }
 
 .footer {
-    bottom:0;
-    position:absolute;
     width:100%;
     background: white;
     color: black;

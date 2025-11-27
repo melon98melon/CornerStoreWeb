@@ -1,16 +1,24 @@
 <template>
     <section class="products-gallery">
-        <div class="title">
-            <h2>Our Products</h2>
-            <p>Browse our selection of quality items! From your internet to your door.</p>
+        <div class="title-display">
+            <div class="title">
+                <h2>Our Products</h2>
+                <p>Browse our selection of quality items! From your internet to your door.</p>
+            </div>
+        </div>
+        <br></br>
+        <div class="spacer" style="height: 3rem;"></div>
+        <div class="search-bar" >
+            <input type="text" v-model="productStore.searchQuery" placeholder="Search products..." />
         </div>
         <div
             class="card"
-            v-for="product in productStore.products"
+            v-for="product in productStore.filteredProducts"
             :key="product.id"
             :aria-label="product.name"
-        >
-            <div class="image-wrap">
+        > 
+        <div >
+            <div class="image-wrap" @click="goToDetails(product)">
                 <img :src="product.image || placeholder" :alt="product.name" />
                 <!--<span v-if="product.sale" class="badge">-{{ product.sale }}%</span>-->
             </div>
@@ -21,7 +29,7 @@
                 <div class="price">
                     <!--<span class="current">\${{typeof product.price === "number"? salePrice(product).toFixed(2) : "N/A" }}</span>
                     <span v-if="product.sale" class="original">\${{ typeof product.price === "number"? product.price.toFixed(2): "N/A" }}</span>-->
-                    <span class="current">\${{ typeof product.price === "number"? product.price.toFixed(2): "N/A" }}</span>
+                    <span class="current">${{ typeof product.price === "number"? product.price.toFixed(2): "N/A" }}</span>
                 </div>
 
                 <div class="actions">
@@ -39,22 +47,27 @@
                 </div>
             </div>
         </div>
+        </div>
     </section>
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
-import { onMounted } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useProductStore } from '../stores/productStore'
 
 const productStore = useProductStore()
+const router = useRouter()
+
 
 onMounted(() => {
   productStore.fetchProducts()
 })
-console.log(productStore.products)
-console.log('Products loaded in products.vue')
-console.log(productStore.products[0])
+
+function goToDetails(product){
+    router.push('/product/' + product.id);
+}
+
 
 const emit = defineEmits(['buy', 'like'])
 
@@ -64,6 +77,15 @@ const placeholder = 'https://via.placeholder.com/320x200?text=No+Image'
 
 // Simple likes store: map productId -> count (and treat >0 as liked)
 const likes = reactive({})
+
+function toggleLike(product) {
+    if (isLiked(product)) {
+        delete likes[product.id]
+    } else {
+        likes[product.id] = 1
+    }
+    emit('like', product, isLiked(product))
+}
 
 // Check if product is liked
 function isLiked(product) {
@@ -83,6 +105,16 @@ function salePrice(product) {
 </script>
 
 <style scoped>
+.search-bar {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+.title-display {
+    width:100%;
+    display: flex;
+}
 .title {
     text-align: center;
     margin-bottom: 1rem;
@@ -145,12 +177,14 @@ function salePrice(product) {
 
 .name {
     margin: 0;
-    font-size: 16px;
+    font-size: 18px;
+    font-weight: bold;
     line-height: 1.2;
     color: #111827;
 }
 
 .price {
+    margin-left: auto;
     display: flex;
     align-items: baseline;
     gap: 8px;
@@ -182,7 +216,7 @@ button {
 }
 
 button.buy {
-    background: #189929;
+    background: var(--green);
     color: white;
     flex: 1;
 }

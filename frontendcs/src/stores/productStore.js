@@ -3,7 +3,8 @@ import axios from 'axios'
 
 export const useProductStore = defineStore('product', {
   state: () => ({
-    products: []
+    products: [],
+    searchQuery: ''
   }),
   actions: {
     async fetchProducts() {
@@ -15,5 +16,19 @@ export const useProductStore = defineStore('product', {
         console.error('Failed to fetch products:', err)
       }
     }
+  },
+  getters: {
+    filteredProducts: (state) => {
+      // if searchQuery is empty → return all products
+      if (!state.searchQuery) return state.products
+
+      // otherwise filter
+      const q = state.searchQuery.toLowerCase()
+      return state.products.filter(p =>
+        p.name.toLowerCase().includes(q) ||
+        String(p.price).includes(q)
+      )
+    }
   }
+
 })

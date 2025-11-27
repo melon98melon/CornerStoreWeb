@@ -6,10 +6,9 @@ import Navbar from './components/navbar.vue';
 
 
 <template>
-  <Navbar/>
-  <router-view />
-  <Footer/>
+  <Navbar/>  
   <RouterView />
+  <Footer/>
 </template>
 
 <style scoped>

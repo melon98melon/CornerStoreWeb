@@ -1,14 +1,15 @@
 package com.csproj.CornerStore.controllers;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.csproj.CornerStore.entity.customer;
 import com.csproj.CornerStore.service.customerService;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/customers")
+@RequestMapping("/api/customers")
 public class customerController {
+
     private final customerService customerService;
 
     public customerController(customerService customerService) {
@@ -21,10 +22,8 @@ public class customerController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<customer> getCustomerById(@PathVariable Integer id) {
-        return customerService.getCustomerById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public Optional<customer> getCustomerById(@PathVariable int id) {
+        return customerService.getCustomerById(id);
     }
 
     @PostMapping
@@ -32,19 +31,10 @@ public class customerController {
         return customerService.createCustomer(customer);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<customer> updateCustomer(@PathVariable Integer id, @RequestBody customer customer) {
-        try {
-            return ResponseEntity.ok(customerService.updateCustomer(id, customer));
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCustomer(@PathVariable Integer id) {
+    public void deleteCustomer(@PathVariable int id) {
         customerService.deleteCustomer(id);
-        return ResponseEntity.noContent().build();
     }
 }
+
 

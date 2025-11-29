@@ -231,6 +231,7 @@
         .then(response => response.json())
         .then(data => {
             products = data; // store backend data in variable
+            localStorage.setItem('products_cache_v1', JSON.stringify(products)); // cache products
             console.log(products);
 
             // derive categories AFTER products are loaded

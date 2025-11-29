@@ -31,5 +31,8 @@ public class PageController {
     public String cartPage() {
         return "cart"; // maps to admin.html in /templates
     }
-
+     @GetMapping("/wishlist")
+    public String wishlistPage() {
+        return "wishlist"; // maps to admin.html in /templates
+    }
 }

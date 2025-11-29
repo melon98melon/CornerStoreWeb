@@ -1,0 +1,323 @@
+<!-- /src/main/resources/templates/cart.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Your Cart</title>
+  <link rel="stylesheet" th:href="@{/navbar.css}">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --gap: 16px;
+      --muted: #666;
+      --accent: #0b6efd;
+      --danger: #c62828;
+      --border: #ddd;
+      --bg: #f7f7f9;
+    }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; background: var(--bg); color: #222; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+
+    .layout { display: grid; grid-template-columns: 1fr 340px; gap: var(--gap); }
+    @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+
+    /* Left: table */
+    .card { background: #fff; border: 1px solid var(--border); border-radius: 8px; }
+    .card-header { padding: 14px 16px; border-bottom: 1px solid var(--border); font-weight: 600; }
+    .card-body { padding: 16px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    th { font-weight: 600; color: #333; }
+    td.price, td.total { white-space: nowrap; }
+    .qty-input { width: 64px; padding: 6px; text-align: center; border: 1px solid var(--border); border-radius: 6px; }
+    .remove-btn { background: none; border: 1px solid var(--danger); color: var(--danger); padding: 6px 10px; border-radius: 6px; cursor: pointer; }
+    .remove-btn:hover { background: #fdecec; }
+
+    .empty { padding: 24px; color: var(--muted); font-style: italic; }
+
+    /* Right: summary */
+    .summary { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 16px; position: sticky; top: 16px; }
+    .summary-row { display: flex; justify-content: space-between; margin: 8px 0; }
+    .summary-row .label { color: var(--muted); }
+    .summary-total { font-weight: 700; font-size: 18px; margin-top: 8px; }
+    .free-shipping { margin-top: 8px; padding: 8px; background: #eef9f0; color: #237a3b; border: 1px solid #cfe9d7; border-radius: 6px; }
+
+    .confirm-btn { width: 100%; margin-top: 16px; padding: 10px 12px; background: var(--accent); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+    .confirm-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* Modal */
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.35); display: none; align-items: center; justify-content: center; }
+    .modal { width: 620px; max-width: 92vw; background: #fff; border-radius: 10px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+    .modal-header { padding: 14px 16px; border-bottom: 1px solid var(--border); font-weight: 600; }
+    .modal-body { padding: 16px; display: grid; gap: 12px; }
+    .field { display: grid; gap: 6px; }
+    .field label { font-size: 13px; color: var(--muted); }
+    .field input, .field textarea { padding: 10px; border: 1px solid var(--border); border-radius: 6px; font: inherit; }
+    .modal-footer { padding: 12px 16px; display: flex; gap: 10px; justify-content: flex-end; border-top: 1px solid var(--border); }
+    .btn-secondary { background: #f0f2f6; border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; cursor: pointer; }
+    .btn-primary { background: var(--accent); color: #fff; border: none; border-radius: 6px; padding: 8px 12px; cursor: pointer; }
+    .arrival-note { margin-top: 6px; color: #237a3b; font-weight: 600; display: none; }
+
+    .toast { position: fixed; bottom: 16px; right: 16px; background: #0b6efd; color: #fff; padding: 10px 14px; border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,0.2); display: none; }
+  </style>
+</head>
+<body>
+   <div th:replace="fragments/navbar :: navbar"></div> 
+  <div class="container">
+    <br><br><br>
+    <h1>Your Cart</h1>
+    <div class="layout">
+      <!-- Left: cart table -->
+      <div class="card">
+        <div class="card-header">Products you want to buy</div>
+        <div class="card-body">
+          <div id="cart-empty" class="empty" style="display:none;">Your cart is empty.</div>
+          <table id="cart-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Line total</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="cart-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Right: order summary -->
+      <div class="summary">
+        <div class="summary-row">
+          <div class="label">Subtotal</div>
+          <div id="sum-subtotal">$0.00</div>
+        </div>
+        <div class="summary-row">
+          <div class="label">Taxes (8%)</div>
+          <div id="sum-taxes">$0.00</div>
+        </div>
+        <div class="summary-row">
+          <div class="label">Shipping</div>
+          <div id="sum-shipping">Free</div>
+        </div>
+        <div class="summary-total">
+          Total: <span id="sum-total">$0.00</span>
+        </div>
+
+        <div class="free-shipping">Free shipping label: Eligible — no shipping cost will be charged.</div>
+        <button id="confirm-purchase" class="confirm-btn">Confirm Purchase</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="modal-backdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal">
+      <div class="modal-header">Complete your purchase</div>
+      <div class="modal-body">
+        <div class="field">
+          <label for="address">Mailing address</label>
+          <textarea id="address" rows="3" placeholder="Street, City, State, ZIP"></textarea>
+        </div>
+        <div class="field">
+          <label for="card-number">Credit card number</label>
+          <input id="card-number" type="text" inputmode="numeric" autocomplete="cc-number" placeholder="1234 5678 9012 3456" />
+        </div>
+        <div class="field">
+          <label for="card-exp">Expiration date (MM/YY)</label>
+          <input id="card-exp" type="text" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/YY" />
+        </div>
+        <div class="field">
+          <label for="card-cvv">Security code (CVV)</label>
+          <input id="card-cvv" type="text" inputmode="numeric" autocomplete="cc-csc" placeholder="123" />
+        </div>
+        <div id="arrival-note" class="arrival-note">Products will arrive in 1–2 days.</div>
+      </div>
+      <div class="modal-footer">
+        <button id="cancel-modal" class="btn-secondary">Cancel</button>
+        <button id="confirm-modal" class="btn-primary">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">Order completed! Thank you.</div>
+
+  <script>
+    // Storage keys
+    const CART_KEY = 'shopping_cart_v1';
+
+    // Tax config (adjust if needed)
+    const TAX_RATE = 0.08;
+    const SHIPPING_COST = 0.00; // Free
+
+    // Load cart
+    let cart = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
+    // Expected structure when adding from product page:
+    // { id, name, price, quantity }
+    // If your product page stores duplicates, normalize to quantities:
+    cart = normalizeCart(cart);
+
+    function normalizeCart(items) {
+      const map = new Map();
+      for (const item of items) {
+        const key = item.id;
+        const prev = map.get(key);
+        if (prev) {
+          map.set(key, { ...prev, quantity: (prev.quantity || 1) + (item.quantity || 1) });
+        } else {
+          map.set(key, { id: item.id, name: item.name, price: item.price, quantity: item.quantity || 1 });
+        }
+      }
+      return Array.from(map.values());
+    }
+
+    function saveCart() {
+      localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    }
+
+    function formatPrice(n) {
+      return '$' + (n ?? 0).toFixed(2);
+    }
+
+    // Render functions
+    function renderTable() {
+      const tbody = document.getElementById('cart-tbody');
+      const empty = document.getElementById('cart-empty');
+      const table = document.getElementById('cart-table');
+
+      tbody.innerHTML = '';
+
+      if (!cart.length) {
+        empty.style.display = '';
+        table.style.display = 'none';
+        updateSummary();
+        return;
+      }
+      empty.style.display = 'none';
+      table.style.display = '';
+
+      cart.forEach((item, idx) => {
+        const tr = document.createElement('tr');
+
+        const tdName = document.createElement('td');
+        tdName.textContent = item.name;
+
+        const tdPrice = document.createElement('td');
+        tdPrice.className = 'price';
+        tdPrice.textContent = formatPrice(item.price);
+
+        const tdQty = document.createElement('td');
+        const qtyInput = document.createElement('input');
+        qtyInput.className = 'qty-input';
+        qtyInput.type = 'number';
+        qtyInput.min = '1';
+        qtyInput.value = item.quantity;
+        qtyInput.addEventListener('change', () => {
+          const newQty = Math.max(1, parseInt(qtyInput.value || '1', 10));
+          item.quantity = newQty;
+          saveCart();
+          renderTable(); // re-render to update totals
+        });
+        tdQty.appendChild(qtyInput);
+
+        const tdLineTotal = document.createElement('td');
+        tdLineTotal.className = 'total';
+        tdLineTotal.textContent = formatPrice(item.price * item.quantity);
+
+        const tdActions = document.createElement('td');
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'remove-btn';
+        removeBtn.textContent = 'Remove';
+        removeBtn.addEventListener('click', () => {
+          cart.splice(idx, 1);
+          saveCart();
+          renderTable();
+        });
+        tdActions.appendChild(removeBtn);
+
+        tr.appendChild(tdName);
+        tr.appendChild(tdPrice);
+        tr.appendChild(tdQty);
+        tr.appendChild(tdLineTotal);
+        tr.appendChild(tdActions);
+
+        tbody.appendChild(tr);
+      });
+
+      updateSummary();
+    }
+
+    function updateSummary() {
+      const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const taxes = subtotal * TAX_RATE;
+      const shipping = SHIPPING_COST;
+      const total = subtotal + taxes + shipping;
+
+      document.getElementById('sum-subtotal').textContent = formatPrice(subtotal);
+      document.getElementById('sum-taxes').textContent = formatPrice(taxes);
+      document.getElementById('sum-shipping').textContent = shipping === 0 ? 'Free' : formatPrice(shipping);
+      document.getElementById('sum-total').textContent = formatPrice(total);
+
+      // Disable confirm if cart empty
+      document.getElementById('confirm-purchase').disabled = cart.length === 0;
+    }
+
+    // Modal controls
+    const backdrop = document.getElementById('modal-backdrop');
+    const arrivalNote = document.getElementById('arrival-note');
+    const toast = document.getElementById('toast');
+
+    function openModal() {
+      backdrop.style.display = 'flex';
+      backdrop.setAttribute('aria-hidden', 'false');
+      arrivalNote.style.display = 'none';
+    }
+    function closeModal() {
+      backdrop.style.display = 'none';
+      backdrop.setAttribute('aria-hidden', 'true');
+    }
+
+    document.getElementById('confirm-purchase').addEventListener('click', openModal);
+    document.getElementById('cancel-modal').addEventListener('click', closeModal);
+
+    // Show arrival note once user fills any payment field or address
+    ['address','card-number','card-exp','card-cvv'].forEach(id => {
+      const el = document.getElementById(id);
+      el.addEventListener('input', () => {
+        arrivalNote.style.display = '';
+      });
+    });
+
+    // Minimal validation and confirm flow
+    document.getElementById('confirm-modal').addEventListener('click', () => {
+      const address = document.getElementById('address').value.trim();
+      const cardNumber = document.getElementById('card-number').value.replace(/\s+/g,'');
+      const cardExp = document.getElementById('card-exp').value.trim();
+      const cardCvv = document.getElementById('card-cvv').value.trim();
+
+      // Simple checks (non-empty; you can expand as needed)
+      if (!address || !cardNumber || !cardExp || !cardCvv) {
+        alert('Please complete all fields before confirming.');
+        return;
+      }
+
+      // Order completed: clear cart, close modal, show toast
+      cart = [];
+      saveCart();
+      renderTable();
+      closeModal();
+      showToast('Order completed! Thank you.');
+    });
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.style.display = '';
+      setTimeout(() => { toast.style.display = 'none'; }, 2500);
+    }
+
+    // Initial render
+    renderTable();
+  </script>
+</body>
+</html>

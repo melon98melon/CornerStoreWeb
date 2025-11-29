@@ -27,5 +27,9 @@ public class PageController {
     public String productsAdminPage() {
         return "admin"; // maps to admin.html in /templates
     }
+    @GetMapping("/cart")
+    public String cartPage() {
+        return "cart"; // maps to admin.html in /templates
+    }
 
 }

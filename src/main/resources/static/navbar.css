@@ -3,7 +3,7 @@
         padding: 10px;
         background-color: white;
         align-items: center;
-        position:absolute;
+        position:fixed;
         top:0;
         width:100%;
     }

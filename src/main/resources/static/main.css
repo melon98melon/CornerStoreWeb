@@ -15,3 +15,9 @@
     --border-color: #dee2e6;
     --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 }
+
+body html {
+    font-family: Arial ,sans-serif;
+    background-color: var(--cream);
+    color: black;
+}

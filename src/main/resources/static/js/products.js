@@ -6,13 +6,15 @@
                 response.json();})
             .then(data => {
             products = data; // store backend data in variable
-            console.log(products);})
+            console.log(products);
+            console.log("category: " + products.category);
+        renderGrid();})
             .catch(error => console.error("Error fetching products:", error));
 
 
         // derive categories
         const categoriesSet = new Set(products.map(p => p.category));
-        const categories = ["All", ...categoriesSet];
+        const categories = ["All", "Meat","Produce","Dairy","Dessert"];
 
         const grid = document.getElementById('grid');
         const categoriesEl = document.getElementById('categories');
@@ -48,7 +50,6 @@
                 btn.textContent = cat;
                 btn.onclick = () => {
                     activeCategory = cat;
-                    renderCategories();
                     renderGrid();
                 };
                 categoriesEl.appendChild(btn);
@@ -62,6 +63,7 @@
         function renderGrid(){
             const filtered = products.filter(p => {
                 const matchesCategory = activeCategory === 'All' || p.category === activeCategory;
+                console.log(p.category.name);
                 const matchesQuery = !query || p.name.toLowerCase().includes(query.toLowerCase());
                 return matchesCategory && matchesQuery;
             });

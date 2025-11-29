@@ -1,5 +1,6 @@
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -16,20 +17,26 @@
             --max-width:1100px;
         }
         *{box-sizing:border-box}
+        
         body{
-            margin:24px;
-            font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-            background:#f5f7fb;
-            color:#111;
-            display:flex;
-            justify-content:center;
+            margin-top: 80px;
+            font-family: Arial, sans-serif;
+            background-color: var(--cream);
         }
 
         .container{
+            margin-top: 5%;
+            margin-left: 10%;
             width:100%;
             max-width:var(--max-width);
         }
-
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 200px;
+            
+        }
         h1{
             margin:0 0 14px 0;
             font-size:28px;
@@ -116,7 +123,7 @@
         }
         .thumb img{
             max-width:100%;
-            max-height:100%;
+            height: 150px;
             display:block;
         }
 
@@ -194,7 +201,7 @@
     </style>
 </head>
 <body>
-    <!--<div th:replace="fragments/navbar :: navbar"></div>-->
+    <div th:replace="fragments/navbar :: navbar"></div>
 
     <div class="container">
         <h1 id="page-title">Products</h1>
@@ -214,137 +221,154 @@
         <div id="no-results" class="no-results" style="display:none">No products found.</div>
     </div>
 
+    
     <script>
-        // getting data
-        let products = []; 
+    // getting data
+    let products = []; 
+    let categories = [];
 
-        fetch('/api/products')
-            .then(response => response.json())
-            .then(data => {
+    fetch('/api/products')
+        .then(response => response.json())
+        .then(data => {
             products = data; // store backend data in variable
-            console.log(products);})
-            .catch(error => console.error("Error fetching products:", error));
+            localStorage.setItem('products_cache_v1', JSON.stringify(products)); // cache products
+            console.log(products);
 
+            // derive categories AFTER products are loaded
+            const categoriesSet = new Set(products.map(p => {
+                console.log(p.category.name);
+                return p.category.name;
+            }));
+            categories = ["All", ...categoriesSet];
 
-        // derive categories
-        const categoriesSet = new Set(products.map(p => {p.category.name; console.log(p.category.name)}));
-        const categories = ["All", ...categoriesSet];
-
-        const grid = document.getElementById('grid');
-        const categoriesEl = document.getElementById('categories');
-        const searchInput = document.getElementById('search');
-        const clearBtn = document.getElementById('clear-search');
-        const noResults = document.getElementById('no-results');
-
-        let activeCategory = 'All';
-        let query = '';
-
-        // persist likes in localStorage
-        const likesKey = 'product_likes_v1';
-        let likes = JSON.parse(localStorage.getItem(likesKey) || '{}');
-
-        function saveLikes(){
-            localStorage.setItem(likesKey, JSON.stringify(likes));
-        }
-
-        function makePlaceholderSvg(name, color){
-            const initials = name.split(' ').map(s=>s[0]).slice(0,2).join('').toUpperCase();
-            const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='600' height='400'>
-                <rect width='100%' height='100%' fill='${color}'/>
-                <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='64' font-family='sans-serif' fill='#fff'>${initials}</text>
-            </svg>`;
-            return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
-        }
-
-        function renderCategories(){
-            categoriesEl.innerHTML = '';
-            categories.forEach(cat => {
-                const btn = document.createElement('button');
-                btn.className = 'category-btn' + (cat===activeCategory ? ' active' : '');
-                btn.textContent = cat;
-                btn.onclick = () => {
-                    activeCategory = cat;
-                    renderCategories();
-                    renderGrid();
-                };
-                categoriesEl.appendChild(btn);
-            });
-        }
-
-        function formatPrice(n){
-            return '$' + n.toFixed(2);
-        }
-
-        function renderGrid(){
-            const filtered = products.filter(p => {
-                const matchesCategory = activeCategory === 'All' || p.category === activeCategory;
-                const matchesQuery = !query || p.name.toLowerCase().includes(query.toLowerCase());
-                return matchesCategory && matchesQuery;
-            });
-
-            grid.innerHTML = '';
-            if(filtered.length === 0){
-                noResults.style.display = '';
-                return;
-            } else {
-                noResults.style.display = 'none';
-            }
-
-            filtered.forEach(p => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `
-                    <div class="thumb">
-                        <img src="${p.image}" alt="${p.name}" />
-                    </div>
-                    <div class="card-body">
-                        <div class="title-row">
-                            <div class="product-name" title="${p.name}">${p.name}</div>
-                            <div class="price">${formatPrice(p.price)}</div>
-                        </div>
-                        <div style="color:var(--muted); font-size:13px">${p.category.name}</div>
-                        <div class="actions">
-                            <button class="btn buy" data-id="${p.id}">Buy</button>
-                            <button class="btn like" data-id="${p.id}">${likes[p.id] ? '♥' : '♡'}</button>
-                        </div>
-                    </div>
-                `;
-                grid.appendChild(card);
-
-                // attach listeners
-                const buyBtn = card.querySelector('.btn.buy');
-                buyBtn.addEventListener('click', () => {
-                    // placeholder action for buying
-                    alert('Added "' + p.name + '" to cart — price ' + formatPrice(p.price));
-                });
-
-                const likeBtn = card.querySelector('.btn.like');
-                likeBtn.addEventListener('click', () => {
-                    likes[p.id] = !likes[p.id];
-                    saveLikes();
-                    likeBtn.textContent = likes[p.id] ? '♥' : '♡';
-                });
-            });
-        }
-
-        // events
-        searchInput.addEventListener('input', (e) => {
-            query = e.target.value.trim();
+            // now render
+            renderCategories();
             renderGrid();
+        })
+        .catch(error => console.error("Error fetching products:", error));
+
+    const grid = document.getElementById('grid');
+    const categoriesEl = document.getElementById('categories');
+    const searchInput = document.getElementById('search');
+    const clearBtn = document.getElementById('clear-search');
+    const noResults = document.getElementById('no-results');
+
+    let activeCategory = 'All';
+    let query = '';
+
+    // persist likes in localStorage
+    const likesKey = 'product_likes_v1';
+    let likes = JSON.parse(localStorage.getItem(likesKey) || '{}');
+
+    function saveLikes(){
+        localStorage.setItem(likesKey, JSON.stringify(likes));
+    }
+
+    function makePlaceholderSvg(name, color){
+        const initials = name.split(' ').map(s=>s[0]).slice(0,2).join('').toUpperCase();
+        const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='600' height='400'>
+            <rect width='100%' height='100%' fill='${color}'/>
+            <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='64' font-family='sans-serif' fill='#fff'>${initials}</text>
+        </svg>`;
+        return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+    }
+
+    function renderCategories(){
+        categoriesEl.innerHTML = '';
+        categories.forEach(cat => {
+            console.log(cat);
+            const btn = document.createElement('button');
+            btn.className = 'category-btn' + (cat===activeCategory ? ' active' : '');
+            btn.textContent = cat;
+            btn.onclick = () => {
+                activeCategory = cat;
+                renderCategories();
+                renderGrid();
+            };
+            categoriesEl.appendChild(btn);
+        });
+    }
+
+    function formatPrice(n){
+        return '$' + n.toFixed(2);
+    }
+
+    function renderGrid(){
+        const filtered = products.filter(p => {
+            const matchesCategory = activeCategory === 'All' || p.category.name === activeCategory;
+            const matchesQuery = !query || p.name.toLowerCase().includes(query.toLowerCase());
+            return matchesCategory && matchesQuery;
         });
 
-        clearBtn.addEventListener('click', () => {
-            searchInput.value = '';
-            query = '';
-            renderGrid();
-        });
+        grid.innerHTML = '';
+        if(filtered.length === 0){
+            noResults.style.display = '';
+            return;
+        } else {
+            noResults.style.display = 'none';
+        }
 
-        // initialize
-        renderCategories();
+        filtered.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <div class="thumb">
+                    <img src="${p.image}" alt="${p.name}" />
+                </div>
+                <div class="card-body">
+                    <div class="title-row">
+                        <div class="product-name" title="${p.name}">${p.name}</div>
+                        <div class="price">${formatPrice(p.price)}</div>
+                    </div>
+                    <div style="color:var(--muted); font-size:13px">${p.category.name}</div>
+                    <div class="actions">
+                        <button class="btn buy" data-id="${p.id}">Buy</button>
+                        <button class="btn like" data-id="${p.id}">${likes[p.id] ? '♥' : '♡'}</button>
+                    </div>
+                </div>
+            `;
+            grid.appendChild(card);
+
+            // attach listeners
+            const buyBtn = card.querySelector('.btn.buy');
+            buyBtn.addEventListener('click', () => {
+                const key = 'shopping_cart_v1';
+                const cart = JSON.parse(localStorage.getItem(key) || '[]');
+
+                // Find if product already in cart
+                const existing = cart.find(item => item.id === p.id);
+                if (existing) {
+                    existing.quantity = (existing.quantity || 1) + 1;
+                } else {
+                    cart.push({ id: p.id, name: p.name, price: p.price, quantity: 1 });
+                }
+
+                localStorage.setItem(key, JSON.stringify(cart));
+                alert('Added "' + p.name + '" to cart — price ' + formatPrice(p.price));
+            });
+
+            const likeBtn = card.querySelector('.btn.like');
+            likeBtn.addEventListener('click', () => {
+                likes[p.id] = !likes[p.id];
+                saveLikes();
+                likeBtn.textContent = likes[p.id] ? '♥' : '♡';
+            });
+        });
+    }
+
+    // events
+    searchInput.addEventListener('input', (e) => {
+        query = e.target.value.trim();
         renderGrid();
+    });
 
-        // expose a place to change the title programmatically if needed
-        // document.getElementById('page-title').textContent = 'New Title';
-    </script>
+    clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        query = '';
+        renderGrid();
+    });
+
+    // initialization now happens after fetch completes
+</script>
 </body>
 </html>

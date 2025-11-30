@@ -30,5 +30,15 @@ public class productService {
     public void deleteProduct(Long id) {
         productRepository.deleteById(Objects.requireNonNull(id,"product is null"));
     }
+
+    public product updateStock(Long id, int newStock) {
+        product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+        product.setStock(newStock);
+        return productRepository.save(product);
+    }
+
+
+
 }
 

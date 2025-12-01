@@ -1,12 +1,42 @@
 <!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
 <html lang="en">
+    
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Corner Store</title>
+  <meta charset="UTF-8">
+  <title>Cornerstore</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; background-color: #f4f4f4; }
+    header { background: #333; color: #fff; padding: 1rem; }
+    .buttons { margin-top: 2rem; }
+    button { padding: 10px 20px; margin: 10px; font-size: 16px; cursor: pointer; }
+  </style>
 </head>
 <body>
-    <h1>Welcome to Corner Store</h1>
-    <a th:href="@{/products}">Products</a> 
+  <header>
+    <h1>Cornerstore</h1>
+  </header>
+
+  <div class="buttons">
+    <button onclick="enterAsGuest()">Guest</button>
+    <button onclick="enterAsAdmin()">Administrator</button>
+  </div>
+
+  <script>
+  function enterAsGuest() {
+    window.location.href = "/products";
+  }
+
+  function enterAsAdmin() {
+    const password = prompt("Enter administrator password:");
+    if (password === "admin") {
+      // Call backend to set admin session
+      fetch("/setAdminSession", { method: "POST" })
+        .then(() => window.location.href = "/products");
+    } else {
+      alert("Access denied!");
+    }
+  }
+</script>
 </body>
 </html>

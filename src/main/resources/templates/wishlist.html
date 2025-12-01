@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <title>Wishlist</title>
+  <link rel="stylesheet" th:href="@{/main.css}">
   <link rel="stylesheet" th:href="@{/navbar.css}">
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background: #f7f7f9; }
+   
     h1 { margin-bottom: 20px; }
     .wishlist { display: grid; gap: 16px; }
     .item { display: flex; align-items: center; background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 12px; }
@@ -16,14 +17,14 @@
     .btn { padding: 6px 12px; border-radius: 6px; cursor: pointer; margin-left: 8px; }
     .remove-btn { background: #c62828; color: #fff; border: none; }
     .remove-btn:hover { background: #a61c1c; }
-    .cart-btn { background: #0b6efd; color: #fff; border: none; }
+    .cart-btn { background: var(--green); color: #fff; border: none; }
     .cart-btn:hover { background: #0846a3; }
     .empty { color: #666; font-style: italic; }
   </style>
 </head>
 <body>
     <div th:replace="fragments/navbar :: navbar"></div>
-    <br><br><br>
+  <div class="container"> 
   <h1>Your Wishlist</h1>
   
   <div id="wishlist" class="wishlist"></div>
@@ -89,6 +90,7 @@
 
     renderWishlist();
   </script>
+</div>
 </body>
 </html>
 

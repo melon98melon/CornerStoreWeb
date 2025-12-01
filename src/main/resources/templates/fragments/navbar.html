@@ -1,13 +1,71 @@
 <div th:fragment="navbar">
+  <style>
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 70px;
+      background-color:whitesmoke;
+      color: white;
+      display: flex;
+      align-items: left;
+      justify-content: space-between;
+      padding: 0 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+
+    .navbar img {
+      height: 60px;
+    }
+
+    .navbar h3 {
+      margin: 0 20px;
+      position: fixed;
+      margin-left: 600px;
+    }
+    .navbar nav {
+      display: flex;
+      position: fixed;
+      align-items: center;
+      background-color:whitesmoke;
+      color: brown;
+      margin-left: 100px;
+    }
+
+    .navbar  a {
+      color: rgb(160, 126, 17);
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .navbar nav a:hover {
+      text-decoration: underline;
+      color: rgb(3, 92, 15);
+    }
+  </style>
     <div class ="navbar">
         <img th:src="@{/images/Corner Store Logo-modified.png}" alt="Corner Store Logo">
         <h3>Corner Store</h3>
     <nav>
       <a th:href="@{/products}">Products</a> 
       <a th:href="@{/cart}">Cart</a>
-      <a th:href="@{/admin}">Admin</a>
+      <a th:if="${session.isAdmin}" th:href="@{/admin}">Admin</a>
       <a th:href="@{/wishlist}">Wishlist</a>
+      
 
     </nav>
+    <div>
+      <a  style="padding-right: 50px;" onclick="logout()">Logout</a>
+    </div>
+    
+    <script>
+      function logout() {
+        fetch("/clearAdminSession", { method: "POST" })
+          .then(() => window.location.href = "/");
+      }
+    </script>
+
     </div>
 </div>
